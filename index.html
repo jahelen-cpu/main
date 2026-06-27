@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI와 대화로 만든 것들</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #F2F8F2;
+            --surface: #FFFFFF;
+            --green-900: #1B5E20;
+            --green-700: #2E7D32;
+            --green-500: #4CAF50;
+            --green-100: #E8F5E9;
+            --green-50: #F1F8F1;
+            --border: #C8E6C9;
+            --text: #1C2B1C;
+            --muted: #5A705A;
+            --sans: 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', sans-serif;
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 0 16px 64px;
+            line-height: 1.6;
+        }
+
+        /* ── Header ── */
+        header {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 52px 0 36px;
+            border-bottom: 1.5px solid var(--border);
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .header-eyebrow {
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--green-700);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            font-weight: 800;
+            color: var(--green-900);
+            line-height: 1.2;
+        }
+
+        header p {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        .btn-add {
+            padding: 11px 22px;
+            background: var(--green-700);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            white-space: nowrap;
+            transition: background 0.2s, transform 0.1s;
+            flex-shrink: 0;
+        }
+        .btn-add:hover  { background: var(--green-900); }
+        .btn-add:active { transform: scale(0.96); }
+
+        /* ── Sections ── */
+        .category-section {
+            max-width: 860px;
+            margin: 44px auto 0;
+        }
+
+        .category-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--green-900);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-title::after {
+            content: '';
+            flex: 1;
+            height: 1.5px;
+            background: var(--border);
+        }
+
+        .category-desc {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: box-shadow 0.18s, border-color 0.18s;
+        }
+        .card:hover {
+            box-shadow: 0 4px 18px rgba(46,125,50,0.10);
+            border-color: var(--green-500);
+        }
+
+        .card-icon { font-size: 24px; line-height: 1; margin-bottom: 4px; }
+
+        .card-name {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--green-900);
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 7px;
+            margin-top: 10px;
+        }
+
+        .btn-open {
+            flex: 1;
+            padding: 9px;
+            background: var(--green-100);
+            color: var(--green-900);
+            border: 1.5px solid var(--green-700);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-family: inherit;
+            transition: background 0.15s;
+        }
+        .btn-open:hover { background: #D0EDD0; }
+
+        .btn-edit, .btn-del {
+            padding: 9px 11px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: none;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .btn-edit { color: var(--muted); }
+        .btn-edit:hover { background: var(--green-50); border-color: var(--green-500); color: var(--green-700); }
+        .btn-del  { color: #C62828; }
+        .btn-del:hover  { background: #FFF3F3; border-color: #EF9A9A; }
+
+        .empty-msg {
+            max-width: 860px;
+            margin: 60px auto;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 2;
+        }
+
+        /* ── Modal ── */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .overlay.open { display: flex; }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 28px;
+            width: 430px;
+            max-width: 95vw;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+            border: 1.5px solid var(--border);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 { font-size: 16px; font-weight: 800; color: var(--green-900); }
+        .modal-close {
+            background: none; border: none; font-size: 18px;
+            cursor: pointer; color: var(--muted);
+            padding: 2px 6px; border-radius: 6px;
+        }
+        .modal-close:hover { background: var(--green-50); }
+
+        .field { margin-bottom: 14px; }
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 6px;
+            letter-spacing: 0.04em;
+        }
+        .field input, .field textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text);
+            background: var(--bg);
+        }
+        .field input:focus, .field textarea:focus {
+            outline: none;
+            border-color: var(--green-500);
+            background: white;
+        }
+        .field textarea { height: 70px; resize: vertical; }
+
+        .modal-footer { display: flex; gap: 8px; margin-top: 18px; }
+
+        .btn {
+            padding: 11px 22px;
+            border: none;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-green { background: var(--green-700); color: white; }
+        .btn-green:hover { background: var(--green-900); }
+        .btn-gray { background: var(--green-50); color: var(--muted); border: 1.5px solid var(--border); }
+        .btn-gray:hover { background: var(--green-100); }
+
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(12px);
+            background: var(--green-900);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <div class="header-eyebrow">jahelen-cpu · 디지털 도구 모음</div>
+        <h1>AI와 대화로 만든 것들</h1>
+        <p>코딩 없이 프롬프트만으로 완성한 교육용 시뮬레이션과 생활 앱입니다.</p>
+    </div>
+    <button class="btn-add" id="btnAdd">+ 추가</button>
+</header>
+
+<div id="mainContent"></div>
+
+<!-- 추가 / 수정 모달 -->
+<div class="overlay" id="overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modalTitle">프로그램 추가</h3>
+            <button class="modal-close" id="btnModalClose">✕</button>
+        </div>
+        <div class="field">
+            <label>아이콘 (이모지)</label>
+            <input type="text" id="inputIcon" placeholder="예: ⚡ 🌱 🏫" autocomplete="off">
+        </div>
+        <div class="field">
+            <label>이름 *</label>
+            <input type="text" id="inputName" placeholder="예: 자유낙하 시뮬레이션" autocomplete="off">
+        </div>
+        <div class="field">
+            <label>링크 (URL) *</label>
+            <input type="url" id="inputUrl" placeholder="https://...">
+        </div>
+        <div class="field">
+            <label>설명 (선택)</label>
+            <textarea id="inputDesc" placeholder="간단한 설명을 입력하세요."></textarea>
+        </div>
+        <div class="field">
+            <label>카테고리</label>
+            <input type="text" id="inputCategory" placeholder="예: 과학 시뮬레이션, 학급 관리, 생활의 편리" autocomplete="off">
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-green" id="btnSave">저장</button>
+            <button class="btn btn-gray" id="btnCancel">취소</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CATEGORY_ORDER = ['과학 시뮬레이션', '학급 관리', '생활의 편리'];
+
+const DEFAULT_PROGRAMS = [
+    { id: 1, icon: '⚡', name: '역학적 에너지 전환과 보존', desc: '기차가 언덕을 오르내리며 위치에너지↔운동에너지가 실시간 전환됩니다.', url: 'https://jahelen-cpu.github.io/science-sim/energy.html', category: '과학 시뮬레이션' },
+    { id: 2, icon: '🪂', name: '자유낙하 시뮬레이션', desc: '진공과 공기 저항 환경에서 세 물체의 낙하를 비교합니다.', url: 'https://jahelen-cpu.github.io/science-sim/freefall.html', category: '과학 시뮬레이션' },
+    { id: 3, icon: '💪', name: '일(Work) 시뮬레이션', desc: '물체를 밀어 W = F × d 개념을 직관적으로 체험합니다. 한·영 이중 표기.', url: 'https://jahelen-cpu.github.io/science-sim/work.html', category: '과학 시뮬레이션' },
+    { id: 4, icon: '🏫', name: '좌석 배치 (303반)', desc: '랜덤 좌석 배치, 주간 순환, 수동 교체, PDF 출력 기능을 제공합니다.', url: 'https://jahelen-cpu.github.io/homeroom/class/303seat.html', category: '학급 관리' },
+    { id: 5, icon: '🌱', name: '가계부 앱 (Cashbook)', desc: '카드 문자를 붙여넣으면 날짜·금액·가맹점을 자동 분석하고 구글 시트로 전송합니다.', url: 'https://github.com/jahelen-cpu/Life/releases', category: '생활의 편리' },
+];
+
+let programs = [];
+let editingId = null;
+let nextId = 100;
+
+function load() {
+    const saved = localStorage.getItem('teacher_programs_v2');
+    if (saved) {
+        programs = JSON.parse(saved);
+        nextId = Math.max(...programs.map(p => p.id), 99) + 1;
+    } else {
+        programs = DEFAULT_PROGRAMS.map(p => ({ ...p }));
+        persist();
+    }
+}
+
+function persist() {
+    localStorage.setItem('teacher_programs_v2', JSON.stringify(programs));
+}
+
+function esc(s) {
+    return String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function render() {
+    const container = document.getElementById('mainContent');
+    if (programs.length === 0) {
+        container.innerHTML = '<div class="empty-msg">등록된 항목이 없습니다.<br>위의 <strong>+ 추가</strong> 버튼을 눌러 추가해보세요.</div>';
+        return;
+    }
+
+    const allCats = [...new Set([...CATEGORY_ORDER, ...programs.map(p => p.category || '기타')])];
+    const usedCats = allCats.filter(cat => programs.some(p => (p.category || '기타') === cat));
+
+    container.innerHTML = usedCats.map(cat => {
+        const items = programs.filter(p => (p.category || '기타') === cat);
+        const cards = items.map(p => `
+            <div class="card">
+                ${p.icon ? `<div class="card-icon">${esc(p.icon)}</div>` : ''}
+                <div class="card-name">${esc(p.name)}</div>
+                ${p.desc ? `<div class="card-desc">${esc(p.desc)}</div>` : ''}
+                <div class="card-actions">
+                    <a class="btn-open" href="${esc(p.url)}" target="_blank" rel="noopener">열기</a>
+                    <button class="btn-edit" onclick="openEdit(${p.id})">수정</button>
+                    <button class="btn-del" onclick="deleteProgram(${p.id})">삭제</button>
+                </div>
+            </div>
+        `).join('');
+        return `
+            <div class="category-section">
+                <div class="category-title">${esc(cat)}</div>
+                <div class="cards-grid">${cards}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function openAdd() {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = '항목 추가';
+    ['inputIcon', 'inputName', 'inputUrl', 'inputDesc', 'inputCategory'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('inputName').focus();
+}
+
+function openEdit(id) {
+    const p = programs.find(p => p.id === id);
+    if (!p) return;
+    editingId = id;
+    document.getElementById('modalTitle').textContent = '항목 수정';
+    document.getElementById('inputIcon').value     = p.icon || '';
+    document.getElementById('inputName').value     = p.name;
+    document.getElementById('inputUrl').value      = p.url;
+    document.getElementById('inputDesc').value     = p.desc || '';
+    document.getElementById('inputCategory').value = p.category || '';
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('inputName').focus();
+}
+
+function closeModal() {
+    document.getElementById('overlay').classList.remove('open');
+}
+
+function handleSave() {
+    const icon = document.getElementById('inputIcon').value.trim();
+    const name = document.getElementById('inputName').value.trim();
+    const url  = document.getElementById('inputUrl').value.trim();
+    const desc = document.getElementById('inputDesc').value.trim();
+    const cat  = document.getElementById('inputCategory').value.trim() || '기타';
+
+    if (!name) { showToast('이름을 입력해주세요.'); return; }
+    if (!url)  { showToast('링크를 입력해주세요.'); return; }
+
+    if (editingId !== null) {
+        const idx = programs.findIndex(p => p.id === editingId);
+        if (idx !== -1) programs[idx] = { id: editingId, icon, name, url, desc, category: cat };
+        showToast('수정되었습니다.');
+    } else {
+        programs.push({ id: nextId++, icon, name, url, desc, category: cat });
+        showToast('추가되었습니다.');
+    }
+
+    persist();
+    render();
+    closeModal();
+}
+
+function deleteProgram(id) {
+    if (!confirm('이 항목을 삭제할까요?')) return;
+    programs = programs.filter(p => p.id !== id);
+    persist();
+    render();
+    showToast('삭제되었습니다.');
+}
+
+let toastTimer = null;
+function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+document.getElementById('btnAdd').addEventListener('click', openAdd);
+document.getElementById('btnSave').addEventListener('click', handleSave);
+document.getElementById('btnCancel').addEventListener('click', closeModal);
+document.getElementById('btnModalClose').addEventListener('click', closeModal);
+document.getElementById('overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+});
+
+load();
+render();
+</script>
+</body>
+</html>
