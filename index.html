@@ -331,7 +331,7 @@
         </div>
         <div class="field">
             <label>카테고리</label>
-            <input type="text" id="inputCategory" placeholder="예: 과학 시뮬레이션, 학급 관리, 생활의 편리" autocomplete="off">
+            <input type="text" id="inputCategory" placeholder="예: 과학 시뮬레이션, 교사 업무, 생활의 편리" autocomplete="off">
         </div>
         <div class="modal-footer">
             <button class="btn btn-green" id="btnSave">저장</button>
@@ -343,13 +343,13 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const CATEGORY_ORDER = ['과학 시뮬레이션', '학급 관리', '생활의 편리'];
+const CATEGORY_ORDER = ['과학 시뮬레이션', '교사 업무', '생활의 편리'];
 
 const DEFAULT_PROGRAMS = [
     { id: 1, icon: '⚡', name: '역학적 에너지 전환과 보존', desc: '기차가 언덕을 오르내리며 위치에너지↔운동에너지가 실시간 전환됩니다.', url: 'https://jahelen-cpu.github.io/science-sim/energy.html', category: '과학 시뮬레이션' },
     { id: 2, icon: '🪂', name: '자유낙하 시뮬레이션', desc: '진공과 공기 저항 환경에서 세 물체의 낙하를 비교합니다.', url: 'https://jahelen-cpu.github.io/science-sim/freefall.html', category: '과학 시뮬레이션' },
     { id: 3, icon: '💪', name: '일(Work) 시뮬레이션', desc: '물체를 밀어 W = F × d 개념을 직관적으로 체험합니다. 한·영 이중 표기.', url: 'https://jahelen-cpu.github.io/science-sim/work.html', category: '과학 시뮬레이션' },
-    { id: 4, icon: '🏫', name: '좌석 배치 (303반)', desc: '랜덤 좌석 배치, 주간 순환, 수동 교체, PDF 출력 기능을 제공합니다.', url: 'https://jahelen-cpu.github.io/homeroom/class/303seat.html', category: '학급 관리' },
+    { id: 4, icon: '🏫', name: '좌석 배치 (303반)', desc: '랜덤 좌석 배치, 주간 순환, 수동 교체, PDF 출력 기능을 제공합니다.', url: 'https://jahelen-cpu.github.io/homeroom/class/303seat.html', category: '교사 업무' },
     { id: 5, icon: '🌱', name: '가계부 앱 (Cashbook)', desc: '카드 문자를 붙여넣으면 날짜·금액·가맹점을 자동 분석하고 구글 시트로 전송합니다.', url: 'https://github.com/jahelen-cpu/Life/releases', category: '생활의 편리' },
 ];
 
