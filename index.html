@@ -358,7 +358,7 @@ let editingId = null;
 let nextId = 100;
 
 function load() {
-    const saved = localStorage.getItem('teacher_programs_v2');
+    const saved = localStorage.getItem('teacher_programs_v3');
     if (saved) {
         programs = JSON.parse(saved);
         nextId = Math.max(...programs.map(p => p.id), 99) + 1;
@@ -369,7 +369,7 @@ function load() {
 }
 
 function persist() {
-    localStorage.setItem('teacher_programs_v2', JSON.stringify(programs));
+    localStorage.setItem('teacher_programs_v3', JSON.stringify(programs));
 }
 
 function esc(s) {
